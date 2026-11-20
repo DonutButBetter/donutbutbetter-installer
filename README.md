@@ -35,6 +35,8 @@ dotnet publish DonutInstaller.csproj -c Release -o out
 
 This makes `out\DonutButBetter-Installer.exe`, a single self-contained exe (no .NET needed to run it).
 
+Releases are built the same way by GitHub Actions (`.github/workflows/release.yml`) straight from the tagged commit, and each one comes with a `.sha256` file to check the download against.
+
 ## Command-line options
 
 ```

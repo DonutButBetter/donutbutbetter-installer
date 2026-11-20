@@ -1,0 +1,32 @@
+# Builds the installer from this source and publishes it when a v<version> tag is pushed,
+# so every released exe can be traced back to the code it was built from.
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Build
+        run: dotnet publish DonutInstaller.csproj -c Release -o out
+      - name: Create release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          cd out
+          sha256sum DonutButBetter-Installer.exe > DonutButBetter-Installer.exe.sha256
+          gh release create "$TAG" DonutButBetter-Installer.exe DonutButBetter-Installer.exe.sha256 \
+            --title "Installer ${TAG#v}" \
+            --notes "Built from this commit by GitHub Actions. The .sha256 file lets you check the download."
